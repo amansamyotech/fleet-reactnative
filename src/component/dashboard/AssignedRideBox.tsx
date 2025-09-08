@@ -17,15 +17,14 @@ const AssignedRideBox: React.FC = () => {
   const { bookings, loading, error, refreshBookings } = useContext(BookingsContext);
   const booking = bookings.length > 0 ? bookings[0] : undefined;
 
-  useFocusEffect(
-    React.useCallback(() => {
+  // useFocusEffect(
+  //   React.useCallback(() => {
 
-      refreshBookings();
-      return () => {
-   
-      };
-    }, [refreshBookings])
-  );
+  //     refreshBookings();
+  //     return () => {
+  //     };
+  //   }, [refreshBookings])
+  // );
 
   console.log("AssignedRideBox - bookings:", bookings);
   console.log("AssignedRideBox - booking:", booking);
@@ -50,30 +49,29 @@ const AssignedRideBox: React.FC = () => {
 
   console.log(booking?.tripStatus)
 
-  const handleJourney = async(): Promise<void> => {
-    if (booking?.id && isStartButtonEnabled) {
-      const bookingId = String(booking.id);
-      
-      try {
-        const payload = {
-          tripStatus:"ongoing"
-        }
-     
+const handleJourney = async (): Promise<void> => {
+  if (!booking?.id) {
+    console.warn("Cannot navigate to ride details: booking ID is undefined");
+    return;
+  }
+
+  const bookingId = String(booking.id);
+
+  try {
+    if (booking.tripStatus === "YetToStart") {
+      const payload = { tripStatus: "ongoing" };
         await rideTimelineServices.updateTripStatus(bookingId, payload);
-        
-        
-        router.navigate({
-          pathname: "/rideDetails",
-          params: { bookingId }
-        });
-       
-      } catch (error: any) {
-        console.error("Error updating trip status:", error);
-      }
-    } else {
-      console.warn("Cannot navigate to ride details: booking ID is undefined or button is disabled");
     }
-  };
+    router.navigate({
+      pathname: "/rideDetails",
+      params: { bookingId, booking: JSON.stringify(booking) }
+    });
+
+  } catch (error: any) {
+    console.error("Error handling journey:", error);
+  }
+};
+
 
 
   if (loading) {
@@ -175,14 +173,13 @@ const AssignedRideBox: React.FC = () => {
           <TextNormal style={styles.fareValue}>{booking.totalAmt ? `₹${booking.totalAmt}` : "$35"}</TextNormal>
         </View>
         <TouchableOpacity 
-          style={[styles.button, !isStartButtonEnabled && styles.disabledButton]} 
-          onPress={handleJourney}
-          disabled={!isStartButtonEnabled}
-        >
-          <TextNormal style={styles.buttonText}>
-            {isStartButtonEnabled ? "Start Journey" : "Journey Started"}
-          </TextNormal>
-        </TouchableOpacity>
+  style={[styles.button]} 
+  onPress={handleJourney}
+>
+  <TextNormal style={styles.buttonText}>
+    {booking?.tripStatus === "YetToStart" ? "Start Journey" : "Journey Started"}
+  </TextNormal>
+</TouchableOpacity>
       </View>
     </View>
   );

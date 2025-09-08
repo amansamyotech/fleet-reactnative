@@ -63,6 +63,7 @@ const Dashboard: React.FC = () => {
 
 const handleRefresh = useCallback(async () => {
   setRefreshing(true);
+  rideTimelineServices.clearBookingsCache();
   await fetchBookings();
 }, [fetchBookings]);
 

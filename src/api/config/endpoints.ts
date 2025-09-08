@@ -6,6 +6,9 @@ export default {
       login: '/auth/login',
       logout: '/auth/logout',
     },
+    location: {
+    create: "/location/create",
+  },
     rideTimeLine:{
       getTodaysRide:'booking/todayBookings',
       addExpenses:'tripExpense/save',

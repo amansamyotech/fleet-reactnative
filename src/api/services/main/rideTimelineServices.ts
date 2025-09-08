@@ -164,7 +164,7 @@ export const rideTimelineServices = {
       );
     
       if (response.data.success) {
-  
+        rideTimelineServices.clearBookingsCache();
         return response.data.data;
       } else {
         throw new Error(response.data.message || 'Failed to fetch bookings');
@@ -200,7 +200,38 @@ export const rideTimelineServices = {
       throw handleApiError(error as AxiosError);
     }
   },
-  
+  saveLocation: async (bookingId: string, latitude: number, longitude: number) => {
+  try {
+    const token = await getTokenFromStorage();
+    if (!token) {
+      throw new Error("Authentication token not found");
+    }
+
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    const payload = {
+      bookingId: Number(bookingId),
+      latitude,
+      longitude,
+    };
+
+    const response: AxiosResponse<ApiResponse<any>> = await apiClient.post(
+      endpoints.location.create, 
+      payload
+    );
+
+    if (response.data.success) {
+      console.log("Location saved successfully:", response.data);
+      return response.data;
+    } else {
+      throw new Error(response.data.message || "Failed to save location");
+    }
+  } catch (error) {
+    console.error("Error saving location:", error);
+    throw handleApiError(error as AxiosError);
+  }
+},
+
   
   // Clear the cache
   clearBookingsCache: () => {
