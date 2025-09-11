@@ -10,7 +10,7 @@ const RideDetails = () => {
     const bookingData = booking ? JSON.parse(booking as string) : null;
 
     return (
-        <OuterContainer>
+        // <OuterContainer>
            <View style={{flex:1}}>
             <CommonHeader title="Ride Details"/>
             {/* <TimeLine bookingId={bookingIdString}/> */}
@@ -18,7 +18,7 @@ const RideDetails = () => {
            <View style={{flex:1}}> */}
              <MapComponent bookingId={bookingIdString} booking={bookingData} />
            </View>
-        </OuterContainer>
+        // </OuterContainer>
     );
 };
 

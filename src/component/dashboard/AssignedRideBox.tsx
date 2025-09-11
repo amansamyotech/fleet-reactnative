@@ -177,7 +177,7 @@ const handleJourney = async (): Promise<void> => {
   onPress={handleJourney}
 >
   <TextNormal style={styles.buttonText}>
-    {booking?.tripStatus === "YetToStart" ? "Start Journey" : "Journey Started"}
+    {booking?.tripStatus === "YetToStart" ? "Start Journey" : "View"}
   </TextNormal>
 </TouchableOpacity>
       </View>
