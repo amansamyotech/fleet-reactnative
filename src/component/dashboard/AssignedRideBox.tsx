@@ -15,8 +15,9 @@ import rideTimelineServices from "@/src/api/services/main/rideTimelineServices";
 const AssignedRideBox: React.FC = () => {
   const router = useRouter();
   const { bookings, loading, error, refreshBookings } = useContext(BookingsContext);
-  const booking = bookings.length > 0 ? bookings[0] : undefined;
+  // const booking = bookings.length > 0 ? bookings[0] : undefined;
 
+const booking = bookings.find(b => b.tripStatus !== "Cancelled") || undefined;
   // useFocusEffect(
   //   React.useCallback(() => {
 
@@ -177,7 +178,7 @@ const handleJourney = async (): Promise<void> => {
   onPress={handleJourney}
 >
   <TextNormal style={styles.buttonText}>
-    {booking?.tripStatus === "YetToStart" ? "Start Journey" : "View"}
+    {booking?.tripStatus === "YetToStart" ? "Start Journey" : "Journey Started"}
   </TextNormal>
 </TouchableOpacity>
       </View>
