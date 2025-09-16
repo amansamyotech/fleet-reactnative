@@ -66,9 +66,7 @@ const ProfileCard: React.FC = () => {
         setLoading(true);
       }
       
-      if (!loginData || !loginData.id) {
-        throw new Error("Driver ID not found");
-      }
+      if (!loginData || !loginData.id) return;
       
       const response = await profileService.getDriverById(loginData.id);
       
