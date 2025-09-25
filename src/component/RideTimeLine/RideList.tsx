@@ -76,12 +76,13 @@ const RideList: React.FC<RideListProps> = ({
     try {
       const today = new Date();
       const tripStartDate = new Date(ride.tripStartDate);
+      const tripEndDate = new Date(ride.tripEndDate);
 
       
       if (activeTab === "upcoming") {
-        return  (tripStartDate >= today && ride.tripStatus !== "Completed");
+        return  (tripStartDate >= today && ride.tripStatus !== "Completed" && ride.tripStatus !== "Cancelled");
       } else {
-        const isCompleted = ride.tripStatus === "Completed" || (tripStartDate < today);
+        const isCompleted = ride.tripStatus === "Completed" || (tripEndDate < today);
         
         if (isCompleted && filterOption !== "All") {
           const currentDate = new Date();

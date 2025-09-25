@@ -25,34 +25,37 @@ const MapComponent: React.FC<MapComponentProps> = ({ bookingId, booking }) => {
   const lastSentRef = useRef<number>(0);
   const webviewRef = useRef<WebView>(null);
 
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
-  const [startPoint, setStartPoint] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
-  const [endPoint, setEndPoint] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
-
-  const [rideStatus, setRideStatus] = useState<string>(
-    booking?.tripStatus || ""
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [startPoint, setStartPoint] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [endPoint, setEndPoint] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [rideStatus, setRideStatus] = useState<string>(booking?.tripStatus || "");
+const handleCancelPress = () => {
+  Alert.alert(
+    "Cancel Ride?",
+    "Are you sure you want to cancel this ride?",
+    [
+      { text: "No", style: "cancel" },
+      { text: "Yes", style: "destructive", onPress: handleCancel }
+    ]
   );
-
+};
   useEffect(() => {
-    if (booking?.tripStatus) {
-      setRideStatus(booking.tripStatus);
-    }
+    if (booking?.tripStatus) setRideStatus(booking.tripStatus);
   }, [booking]);
 
   useEffect(() => {
     const fetchLatLng = async () => {
       try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert(
+            "Location Permission",
+            "Permission to access location was denied"
+          );
+          return;
+        }
         if (booking?.tripStartLoc) {
-          const geoStart = await Location?.geocodeAsync(booking?.tripStartLoc);
+          const geoStart = await Location.geocodeAsync(booking.tripStartLoc);
           if (geoStart.length > 0) {
             setStartPoint({
               latitude: geoStart[0].latitude,
@@ -138,7 +141,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ bookingId, booking }) => {
 
   const sendLocationToBackend = async (latitude: number, longitude: number) => {
     if (!bookingId) return;
-
     const now = Date.now();
     if (now - lastSentRef.current < 4500) return;
     lastSentRef.current = now;
@@ -192,13 +194,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ bookingId, booking }) => {
   );
   const getMapHtml = () => {
     if (!startPoint || !endPoint) return "<h3>Loading route...</h3>";
-
     return `
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8" />
-          <title>Route Map</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
           <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -292,8 +292,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ bookingId, booking }) => {
           originWhitelist={["*"]}
           source={{ html: getMapHtml() }}
           style={styles.map}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
+          javaScriptEnabled
+          domStorageEnabled
           onMessage={(event) => {
             try {
               const data = JSON.parse(event.nativeEvent.data);
@@ -314,42 +314,25 @@ const MapComponent: React.FC<MapComponentProps> = ({ bookingId, booking }) => {
 
       <View style={styles.buttonContainer}>
         {rideStatus === "Cancelled" ? (
-          // Sirf Cancel button (disabled, center me)
           <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              styles.centerButton,
-              styles.disabledButton,
-            ]}
+            style={[styles.cancelButton, styles.centerButton, styles.disabledButton]}
             disabled
           >
             <Text style={styles.buttonText}>Ride Cancelled</Text>
           </TouchableOpacity>
         ) : rideStatus === "Completed" ? (
-          // Sirf Complete button (disabled, center me)
           <TouchableOpacity
-            style={[
-              styles.trackButton,
-              styles.centerButton,
-              styles.disabledButton,
-            ]}
+            style={[styles.trackButton, styles.centerButton, styles.disabledButton]}
             disabled
           >
             <Text style={styles.buttonText}>Ride Completed</Text>
           </TouchableOpacity>
         ) : (
-          // Normal case -> dono buttons
           <>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={handleCancel}
-            >
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCancelPress}>
               <Text style={styles.buttonText}>Cancel Ride</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.trackButton}
-              onPress={handleJourney}
-            >
+            <TouchableOpacity style={styles.trackButton} onPress={handleJourney}>
               <Text style={styles.buttonText}>Journey Complete</Text>
             </TouchableOpacity>
           </>
@@ -374,18 +357,7 @@ const styles = StyleSheet.create({
   cancelButton: { backgroundColor: "red", padding: 10, borderRadius: 8 },
   trackButton: { backgroundColor: "green", padding: 10, borderRadius: 8 },
   buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
-  disabledButton: {
-    backgroundColor: "gray",
-    opacity: 0.6,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  centerButton: {
-    flex: 1,
-    marginHorizontal: "20%",
-    alignItems: "center",
-  },
+  disabledButton: { backgroundColor: "gray", opacity: 0.6 },
+  loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  centerButton: { flex: 1, marginHorizontal: "20%", alignItems: "center" },
 });

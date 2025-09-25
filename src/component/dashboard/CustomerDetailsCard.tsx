@@ -7,8 +7,12 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const CustomerDetailsCard = () => {
-      const { bookings } = useContext(BookingsContext);
-      const booking = bookings.length > 0 ? bookings[0] : undefined;
+  const { bookings } = useContext(BookingsContext);
+ const booking = bookings.find(b => b.tripStatus !== "Cancelled") || undefined;
+  if (!booking || !booking.customer) {
+    return null;
+  }
+
   return (
     <TouchableOpacity style={styles.container}>
       <Text style={styles.title}>Customer Details</Text>
@@ -44,6 +48,7 @@ const styles = StyleSheet.create({
     fontSize: hp(1.9),
     fontWeight: "700",
     color: color.textPrimary,
+    marginBottom: spacing.xs,
   },
   row: {
     flexDirection: "row",

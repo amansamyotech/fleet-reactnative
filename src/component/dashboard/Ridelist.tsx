@@ -1,12 +1,13 @@
 import { color } from "@/src/constants/colors";
 import TextNormal from "@/src/styles/TextNormal";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, ListRenderItem } from "react-native";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { format } from "date-fns";
 import rideTimelineServices from "@/src/api/services/main/rideTimelineServices";
 import useLoginDataStorage from "@/src/hooks/customStorageHook";
 import { Ride } from "../RideTimeLine/RideTypes";
+import { BookingsContext } from "@/src/app/(main)/(home)";
 
 interface RideListProps {
   activeTab?: "upcoming" | "completed";
@@ -21,7 +22,7 @@ const RideList: React.FC<RideListProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { loginData } = useLoginDataStorage();
-
+const { refreshKey } = useContext(BookingsContext);
   const fetchRides = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
@@ -48,6 +49,10 @@ const RideList: React.FC<RideListProps> = ({
     fetchRides();
   }, [fetchRides, activeTab, filterOption]);
 
+  useEffect(() => {
+    fetchRides();
+  }, [refreshKey]);
+
   const formatDate = (dateString: string): string => {
     try {
       return format(new Date(dateString), "MMMM d, yyyy");
@@ -72,13 +77,14 @@ const RideList: React.FC<RideListProps> = ({
     try {
       const today = new Date();
       const tripStartDate = new Date(ride.tripStartDate);
+      const tripEndDate = new Date(ride.tripEndDate);
 
       
       if (activeTab === "upcoming") {
-        return  (tripStartDate >= today && ride.tripStatus !== "Completed");
+        return  (tripStartDate >= today && ride.tripStatus !== "Completed" && ride.tripStatus !== "Cancelled");
       } else {
-        const isCompleted = ride.tripStatus === "Completed" || (tripStartDate < today);
-        
+        const isCompleted = ride.tripStatus === "Completed" || (tripEndDate < today);
+          
         if (isCompleted && filterOption !== "All") {
           const currentDate = new Date();
           const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);

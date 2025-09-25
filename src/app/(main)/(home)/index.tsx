@@ -27,14 +27,17 @@ export const BookingsContext = createContext<{
   loading: boolean;
   error: string | null;
   refreshBookings: () => Promise<void>;
+  refreshKey: number;   
 }>({
   bookings: [],
   loading: false,
   error: null,
   refreshBookings: async () => {},
+ refreshKey: 0,
 });
 
 const Dashboard: React.FC = () => {
+  const [refreshKey, setRefreshKey] = useState(0);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +79,7 @@ const Dashboard: React.FC = () => {
     setRefreshing(true);
     rideTimelineServices.clearBookingsCache();
     await fetchBookings();
+    setRefreshKey(prev => prev + 1); 
   }, [fetchBookings]);
 
   useEffect(() => {
@@ -90,6 +94,7 @@ const Dashboard: React.FC = () => {
       loading,
       error,
       refreshBookings: fetchBookings,
+      refreshKey
     }),
     [bookings, loading, error, fetchBookings]
   );
