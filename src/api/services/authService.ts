@@ -36,12 +36,12 @@ const handleApiError = (error: AxiosError<any>): Error => {
 };
 
 export const authService = {
-  login: async (phone: string, password: string): Promise<LoginResponse> => {
+  login: async (phone: string, password: string,fcmToken:string|null): Promise<LoginResponse> => {
     try {
       console.log(endpoints.auth.login)
       const response: AxiosResponse<LoginResponse> = await apiClient.post(
         endpoints.auth.login, 
-        { mobileNo:phone, password:password }
+        { mobileNo:phone, password:password, fcmToken:fcmToken }
       );
       console.log("response",response)
       // Save tokens when login is successful

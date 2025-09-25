@@ -165,7 +165,35 @@ export const profileService = {
             
             throw handleApiError(axiosError);
         }
-    }
+    },
+     clearFcmToken : async (driverId: string, fcmToken: string|null): Promise<DriverApiResponse> => {
+        try {
+            const token = await getTokenFromStorage();
+
+            if (!token) {
+                throw new Error("Authentication token not found");
+            }
+
+            apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            const response: AxiosResponse<DriverApiResponse> = await apiClient.patch(
+                `${endpoints.auth.clearFcm}/${driverId}`,
+                { fcmToken: null }
+            );
+
+            // Update cached data if request was successful
+            if (response.data.success) {
+                console.log(response.data.data)
+
+                await profileService.saveDriverData(response.data.data);
+
+            }
+
+            return response.data;
+        } catch (error) {
+            throw handleApiError(error as AxiosError);
+        }
+    },
 };
 
 export default profileService;

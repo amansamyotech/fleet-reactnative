@@ -6,10 +6,13 @@ import { heightPercentageToDP } from "react-native-responsive-screen";
 import TextNormal from "@/src/styles/TextNormal";
 import useLoginDataStorage from "@/src/hooks/customStorageHook";
 import { router } from "expo-router";
+import profileService from "@/src/api/services/main/profileServices";
 
 const LogoutButton = () => {
+  const { loginData } = useLoginDataStorage();
   const {logout} = useLoginDataStorage();
   const handleLogout = async() => {
+    await profileService.clearFcmToken(loginData?.id ??'', null);
      await logout();
      router.push("/(auth)/(login)");
   };
