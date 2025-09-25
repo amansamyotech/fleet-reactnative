@@ -5,6 +5,7 @@ export default {
     auth: {
       login: '/auth/login',
       logout: '/auth/logout',
+      clearFcm:'/driver/update-fcmtoken'
     },
     location: {
     create: "/location/create",
@@ -21,5 +22,10 @@ export default {
       driverInfo:'driver/getById',
       updateDriverInfo:'driver/update',
       changePassword:'driver/change-password'
+    },
+    notification:{
+      getNotification:'notifications/driver',
+      readNotification:'notifications/mark-read',
+      readCountNotification:'notifications/driver/unread-count'
     }
   };

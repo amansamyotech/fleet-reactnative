@@ -13,6 +13,7 @@ import { authService } from "@/src/api";
 import useLoginDataStorage from "@/src/hooks/customStorageHook";
 import { useToast } from "@/src/hooks/useToast";
 import { useRouter } from "expo-router";
+import { usePushNotifications } from "../../pushSetup";
 
 interface ApiError {
   message: string;
@@ -26,7 +27,9 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { storeLoginData, loginData } = useLoginDataStorage();
   const { showToast } = useToast();
+   const { fcmToken } = usePushNotifications();
   const router = useRouter();
+console.log("fcm token============================================================", fcmToken);
 
   useEffect(() => {
     if (loginData) {
@@ -57,7 +60,7 @@ const Login: React.FC = () => {
   
     try {
       // Call the authService login method
-      const response = await authService.login(phone, password);
+      const response = await authService.login(phone, password ,fcmToken);
       
       if (response.success && response.data) {
         // Create a loginData object with the received driver data

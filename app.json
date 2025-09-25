@@ -17,7 +17,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sanskrutikanthale.routeex"
+      "package": "com.sanskrutikanthale.routeex",
+      "googleServicesFile": "./google-services.json"
     },
     "androidStatusBar": {
       "barStyle": "dark-content",
@@ -57,9 +58,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "127528e3-b9c6-42b0-9955-0785b9950879"
+        "projectId": "6f42bbbf-b1c3-4641-8674-bcb7281c1463"
       }
     },
-    "owner": "sanskrutikanthale"
+    "owner": "rahulmalviya"
   }
 }
